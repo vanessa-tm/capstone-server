@@ -1,4 +1,4 @@
-import itemsData from "../seed-data/items";
+import itemsData from "../seed-data/items.js";
 
 export async function seed(knex) {
   await knex ("items").del();
