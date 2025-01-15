@@ -1,8 +1,10 @@
 import "dotenv/config";
 import express from "express";
 import itemsRoutes from "./routes/itemsRoute.js";
+import listRoutes from "./routes/listRoute.js";
 
 const app = express();
+app.use(express.json());
 
 const PORT = process.env.PORT || 5050;
 
@@ -13,6 +15,9 @@ app.get("/", (req, res) => {
 
 //items route
 app.use("/items", itemsRoutes);
+
+//lists route 
+app.use("/lists", listRoutes);
 
 
 app.listen(PORT, () => {
