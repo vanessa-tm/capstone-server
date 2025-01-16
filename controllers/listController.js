@@ -25,6 +25,20 @@ export const createList = async (req, res) => {
     }
 };
 
+// Get all lists from the list table
+export const getAllLists = async (req, res) => {
+  try {
+    const lists = await knex("list").select("*");
+
+    res.status(200).json(lists);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch all lists", error });
+  }
+};
+
+
+
+
 
 // Add items to an existing list
 export const addItemsToList = async (req, res) => {

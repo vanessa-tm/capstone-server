@@ -2,9 +2,11 @@ import "dotenv/config";
 import express from "express";
 import itemsRoutes from "./routes/itemsRoute.js";
 import listRoutes from "./routes/listRoute.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const PORT = process.env.PORT || 5050;
 
