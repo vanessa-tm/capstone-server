@@ -39,25 +39,42 @@ export const getAllLists = async (req, res) => {
 
 
 
-
-// Add items to an existing list
-export const addItemsToList = async (req, res) => {
-  const { list_id, items } = req.body;
+export const updateItemsInList = async (req, res) => {
+  const { listId } = req.params;
+  const { items } = req.body;
 
   try {
-    const listItems = items.map((item) => ({
-      list_id,
-      item_name: item.item_name,
-      aisle_number: item.aisle_number,
-    }));
+    // Iterate through the items and update them if they exist, otherwise insert them
+    const updatedItemsPromises = items.map(async (item) => {
+      const existingItem = await knex("list_items")
+        .where({ list_id: listId, item_name: item.item_name })
+        .first();
 
-    await knex("list_items").insert(listItems);
+      if (existingItem) {
+        // Update the item if it exists
+        await knex("list_items")
+          .where({ id: existingItem.id })
+          .update({ aisle_number: item.aisle_number });
+      } else {
+        // Insert new item if it does not exist
+        await knex("list_items").insert({
+          list_id: listId,
+          item_name: item.item_name,
+          aisle_number: item.aisle_number,
+        });
+      }
+    });
 
-    res.status(200).json({ message: "Items added to list successfully" });
+    await Promise.all(updatedItemsPromises); // Wait for all updates/inserts to complete
+
+    res.status(200).json({ message: "Items updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to add items to list", error });
+    res.status(500).json({ message: "Failed to update items", error });
   }
 };
+
+
+
 
 // Get a list with its items
 export const getListWithItems = async (req, res) => {
@@ -78,19 +95,7 @@ export const getListWithItems = async (req, res) => {
   }
 };
 
-// Update a list name
-export const updateListName = async (req, res) => {
-  const { listId } = req.params;
-  const { list_name } = req.body;
 
-  try {
-    await knex("list").where({ id: listId }).update({ list_name });
-
-    res.status(200).json({ message: "List name updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update list name", error });
-  }
-};
 
 // Delete a list
 export const deleteList = async (req, res) => {
