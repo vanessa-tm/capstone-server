@@ -16,6 +16,4 @@ router.get("/:listId", getListWithItems); // Get a list with items
 router.delete("/:listId", deleteList); // Delete a list
 router.put("/:listId/items", updateItemsInList); // update and add items to a list
 
-
-
 export default router;

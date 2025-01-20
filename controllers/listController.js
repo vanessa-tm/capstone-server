@@ -2,11 +2,12 @@ import initKnex from "knex";
 import configuration from "../knexfile.js";
 const knex = initKnex(configuration);
 
+//function to create a new list of grocery item
+
 export const createList = async (req, res) => {
     const { list_name, items } = req.body;
 
     try {
-        //new list
         const [listId] = await knex ("list").insert({list_name});
 
         // if items are provided, insert them into list_items
@@ -15,6 +16,7 @@ export const createList = async (req, res) => {
                 list_id: listId,
                 item_name: item.item_name,
                 aisle_number: item.aisle_number,
+                checked: item.checked || false,
             }));
             await knex ("list_items").insert(listItems);
         }
@@ -25,7 +27,10 @@ export const createList = async (req, res) => {
     }
 };
 
-// Get all lists from the list table
+
+
+// function to get all lists from the list table
+
 export const getAllLists = async (req, res) => {
   try {
     const lists = await knex("list").select("*");
@@ -37,7 +42,7 @@ export const getAllLists = async (req, res) => {
 };
 
 
-
+//function for put request - updating saved list
 
 export const updateItemsInList = async (req, res) => {
   const { listId } = req.params;
@@ -54,13 +59,14 @@ export const updateItemsInList = async (req, res) => {
         // Update the item if it exists
         await knex("list_items")
           .where({ id: existingItem.id })
-          .update({ aisle_number: item.aisle_number });
+          .update({ aisle_number: item.aisle_number, checked: item.checked, });
       } else {
         // Insert new item if it does not exist
         await knex("list_items").insert({
           list_id: listId,
           item_name: item.item_name,
           aisle_number: item.aisle_number,
+          checked: item.checked || false,
         });
       }
     });
@@ -76,7 +82,7 @@ export const updateItemsInList = async (req, res) => {
 
 
 
-// Get a list with its items
+// Get a list based on id and show all items
 export const getListWithItems = async (req, res) => {
   const { listId } = req.params;
 
